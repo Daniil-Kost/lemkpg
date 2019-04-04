@@ -13,7 +13,7 @@ setup(name='lemkpg',
           'psycopg2',
       ],
       classifiers=[
-        "Programming Language :: Python :: 3.5+",
+        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
       ],
       zip_safe=False)

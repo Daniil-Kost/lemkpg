@@ -1,5 +1,9 @@
 **lemkpg - CRUD API for quick and simple connection with PostgreSQL DB**
 
+**Installation**
+
+To install this package run command: `$ pip install lemkpg`
+
 **Usage**
 
 - import LemkPgApi class from lemkpg module: `>>> from lemkpg import LemkPgApi`
