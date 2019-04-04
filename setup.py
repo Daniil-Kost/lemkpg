@@ -12,4 +12,8 @@ setup(name='lemkpg',
           'aiopg',
           'psycopg2',
       ],
+      classifiers=[
+        "Programming Language :: Python :: 3.5+",
+        "License :: OSI Approved :: MIT License",
+      ],
       zip_safe=False)
