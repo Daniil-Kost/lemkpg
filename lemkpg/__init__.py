@@ -1,7 +1,5 @@
 import asyncio
 import sys
-import aiopg
-import psycopg2
 
 from .utils import LemkPgUtils
 from .exceptions import LemkPgError
