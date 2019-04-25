@@ -35,3 +35,11 @@ class LemkPgUtils:
                     except psycopg2.ProgrammingError as e:
                         print(e)
                         return None
+
+    @classmethod
+    async def execute_query(cls, dsn, query):
+        async with aiopg.create_pool(dsn) as pool:
+            async with pool.acquire() as conn:
+                async with conn.cursor() as cursor:
+                    await cursor.execute(query)
+                    return True
