@@ -41,32 +41,37 @@ class LemkPgApi:
             # if python3 version equal or greater then python3.7 - run this case
             return asyncio.run(func)
 
-    def create_table(self, table_name: str, fields: dict):
+    def create_table(self, table_name: str, fields: dict, primary_key=False):
         """
         >>> obj.create_table("demo", {"id": "integer", "date": "text", "trans": "text", "symbol": "text"})
 
         :param table_name: string with table name
         :param fields: dict with new fields and their types (key - field name, value - type)
+        :param  primary_key: bool value - default False - if True add autoincrement primary key
         :return: True if query success
         """
         async def func():
             new_fields = [f"{field[0]} {field[1]}" for field in fields.items()]
-            query = f"""CREATE TABLE {table_name} ({", ".join(new_fields)})"""
+            if not primary_key:
+                query = f"""CREATE TABLE {table_name} ({", ".join(new_fields)})"""
+            else:
+                query = f"""CREATE TABLE {table_name} (id SERIAL PRIMARY KEY, {", ".join(new_fields)})"""
             await LemkPgUtils.execute_query(self.dsn, query)
             return True
 
         return self._run_async(func())
 
-    def insert(self, table_name: str, values: tuple):
+    def insert(self, table_name: str, values: tuple, columns=None):
         """
         >>> obj.insert("demo", (1, '2006-01-05', 'Some Text', 'A'))
 
         :param table_name: string with table name
         :param values: tuple with values
+        :param columns: None or tuple with columns
         :return: True if query success
         """
         async def func():
-            query = f"""INSERT INTO {table_name} VALUES {values}"""
+            query = f"""INSERT INTO {table_name} {tuple(columns) if columns else ''} VALUES {values}"""
             await LemkPgUtils.execute_query(self.dsn, query)
             return True
 
@@ -215,6 +220,158 @@ class LemkPgApi:
                          f""" WHERE {" ".join(conditions)}""")
             else:
                 query = (f"""SELECT {", ".join(fields)} FROM {table_name} {join_type} {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+            result = await LemkPgUtils.get_query_result(self.dsn, query)
+            return result
+
+        return self._run_async(func())
+
+    def inner_join(self, table_name: str, join_table_name: str,
+                   on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+        """
+        >>> obj.inner_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
+
+        :param table_name: string with table name
+        :param join_table_name: string with joins table name
+        :param on_condition: tuple with condition. In tuple should be defined three values:
+                 1) column for assert in ON clause (e.g. "demo.trans")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert from joins table (e.g. "datatable.trans")
+        :param where_conditions_list: list with tuples with conditions in it. In each tuple should be defined four values:
+                 1) column for assert in WHERE clause (e.g. "date")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert (e.g. "2006-01-05")
+                 4) additional value if you need more then one conditions in where clause.
+                    if one tuple in list - this value should be None. If more then one tuple in conditions_list -
+                    this value should be string (e.g. "AND", or "OR")
+        :param fields: list with strings with columns names in it
+         (e.g. "["trans", "date"]. Default None (get all columns -  if param all is True)"
+        :param all: bool param - for check do we need all fields or not. Default - True (get all fields)
+        :return: result if query success
+        """
+        async def func():
+            query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
+            if where_conditions_list:
+                conditions = LemkPgUtils.get_conditions(where_conditions_list)
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} INNER JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                         f""" WHERE {" ".join(conditions)}""")
+            else:
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} INNER JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+            result = await LemkPgUtils.get_query_result(self.dsn, query)
+            return result
+
+        return self._run_async(func())
+
+    def left_join(self, table_name: str, join_table_name: str,
+                  on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+        """
+        >>> obj.left_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
+
+        :param table_name: string with table name
+        :param join_table_name: string with joins table name
+        :param on_condition: tuple with condition. In tuple should be defined three values:
+                 1) column for assert in ON clause (e.g. "demo.trans")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert from joins table (e.g. "datatable.trans")
+        :param where_conditions_list: list with tuples with conditions in it. In each tuple should be defined four values:
+                 1) column for assert in WHERE clause (e.g. "date")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert (e.g. "2006-01-05")
+                 4) additional value if you need more then one conditions in where clause.
+                    if one tuple in list - this value should be None. If more then one tuple in conditions_list -
+                    this value should be string (e.g. "AND", or "OR")
+        :param fields: list with strings with columns names in it
+         (e.g. "["trans", "date"]. Default None (get all columns -  if param all is True)"
+        :param all: bool param - for check do we need all fields or not. Default - True (get all fields)
+        :return: result if query success
+        """
+        async def func():
+            query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
+            if where_conditions_list:
+                conditions = LemkPgUtils.get_conditions(where_conditions_list)
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} LEFT JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                         f""" WHERE {" ".join(conditions)}""")
+            else:
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} LEFT JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+            result = await LemkPgUtils.get_query_result(self.dsn, query)
+            return result
+
+        return self._run_async(func())
+
+    def right_join(self, table_name: str, join_table_name: str,
+                   on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+        """
+        >>> obj.right_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
+
+        :param table_name: string with table name
+        :param join_table_name: string with joins table name
+        :param on_condition: tuple with condition. In tuple should be defined three values:
+                 1) column for assert in ON clause (e.g. "demo.trans")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert from joins table (e.g. "datatable.trans")
+        :param where_conditions_list: list with tuples with conditions in it. In each tuple should be defined four values:
+                 1) column for assert in WHERE clause (e.g. "date")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert (e.g. "2006-01-05")
+                 4) additional value if you need more then one conditions in where clause.
+                    if one tuple in list - this value should be None. If more then one tuple in conditions_list -
+                    this value should be string (e.g. "AND", or "OR")
+        :param fields: list with strings with columns names in it
+         (e.g. "["trans", "date"]. Default None (get all columns -  if param all is True)"
+        :param all: bool param - for check do we need all fields or not. Default - True (get all fields)
+        :return: result if query success
+        """
+        async def func():
+            query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
+            if where_conditions_list:
+                conditions = LemkPgUtils.get_conditions(where_conditions_list)
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} RIGHT JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                         f""" WHERE {" ".join(conditions)}""")
+            else:
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} RIGHT JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+            result = await LemkPgUtils.get_query_result(self.dsn, query)
+            return result
+
+        return self._run_async(func())
+
+    def full_join(self, table_name: str, join_table_name: str,
+                  on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+        """
+        >>> obj.full_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
+
+        :param table_name: string with table name
+        :param join_table_name: string with joins table name
+        :param on_condition: tuple with condition. In tuple should be defined three values:
+                 1) column for assert in ON clause (e.g. "demo.trans")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert from joins table (e.g. "datatable.trans")
+        :param where_conditions_list: list with tuples with conditions in it. In each tuple should be defined four values:
+                 1) column for assert in WHERE clause (e.g. "date")
+                 2) operand for assert column (e.g. "=", or "!=")
+                 3) value for assert (e.g. "2006-01-05")
+                 4) additional value if you need more then one conditions in where clause.
+                    if one tuple in list - this value should be None. If more then one tuple in conditions_list -
+                    this value should be string (e.g. "AND", or "OR")
+        :param fields: list with strings with columns names in it
+         (e.g. "["trans", "date"]. Default None (get all columns -  if param all is True)"
+        :param all: bool param - for check do we need all fields or not. Default - True (get all fields)
+        :return: result if query success
+        """
+        async def func():
+            query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
+            if where_conditions_list:
+                conditions = LemkPgUtils.get_conditions(where_conditions_list)
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
+                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                         f""" WHERE {" ".join(conditions)}""")
+            else:
+                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
             result = await LemkPgUtils.get_query_result(self.dsn, query)
             return result
