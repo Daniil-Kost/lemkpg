@@ -1,5 +1,6 @@
 import aiopg
 import psycopg2
+from .exceptions import LemkPgError
 
 
 class LemkPgUtils:

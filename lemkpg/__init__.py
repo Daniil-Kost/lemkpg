@@ -253,11 +253,11 @@ class LemkPgApi:
             query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
             if where_conditions_list:
                 conditions = LemkPgUtils.get_conditions(where_conditions_list)
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} INNER JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} INNER JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
                          f""" WHERE {" ".join(conditions)}""")
             else:
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} INNER JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} INNER JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
             result = await LemkPgUtils.get_query_result(self.dsn, query)
             return result
@@ -291,11 +291,11 @@ class LemkPgApi:
             query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
             if where_conditions_list:
                 conditions = LemkPgUtils.get_conditions(where_conditions_list)
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} LEFT JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} LEFT JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
                          f""" WHERE {" ".join(conditions)}""")
             else:
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} LEFT JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} LEFT JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
             result = await LemkPgUtils.get_query_result(self.dsn, query)
             return result
@@ -329,11 +329,11 @@ class LemkPgApi:
             query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
             if where_conditions_list:
                 conditions = LemkPgUtils.get_conditions(where_conditions_list)
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} RIGHT JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} RIGHT JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
                          f""" WHERE {" ".join(conditions)}""")
             else:
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} RIGHT JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} RIGHT JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
             result = await LemkPgUtils.get_query_result(self.dsn, query)
             return result
@@ -367,11 +367,11 @@ class LemkPgApi:
             query_fields = ("*" if not fields and all else f'{", ".join(fields)}')
             if where_conditions_list:
                 conditions = LemkPgUtils.get_conditions(where_conditions_list)
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
                          f""" WHERE {" ".join(conditions)}""")
             else:
-                query = (f"""SELECT {", ".join(query_fields)} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
+                query = (f"""SELECT {query_fields} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
                          f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
             result = await LemkPgUtils.get_query_result(self.dsn, query)
             return result
