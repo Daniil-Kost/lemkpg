@@ -1043,7 +1043,7 @@ class AsyncLemkPgApi:
         if conditions_list:
             conditions = LemkPgUtils.get_conditions(conditions_list)
             query = f"""SELECT MIN({column}) FROM {table_name} WHERE {" ".join(conditions)}"""
-         else:
+        else:
             query = f"""SELECT MIN({column}) FROM {table_name}"""
         result = await LemkPgUtils.get_query_result(self.dsn, query)
         return result
