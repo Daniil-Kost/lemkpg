@@ -32,7 +32,7 @@ class LemkPgUtils:
                     try:
                         async for row in cursor:
                             result.append(row)
-                            return result
+                        return result
                     except psycopg2.ProgrammingError as e:
                         print(e)
                         return None
