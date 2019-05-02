@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='lemkpg',
-      version='1.5',
+      version='1.6',
       description='lemkpg package give simple API interface for quick access to PostgreSQL DB via sync or async way',
       url='https://github.com/Daniil-Kost/lemkpg',
       author='Daniil Kostyshak',
