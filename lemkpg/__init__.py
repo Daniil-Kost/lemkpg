@@ -636,7 +636,7 @@ class AsyncLemkPgApi:
         :param columns: None or tuple with columns
         :return: True if query success
         """
-        query = f"""INSERT INTO {table_name} {tuple(columns) if columns else ''} VALUES {values}"""
+        query = f"""INSERT INTO {table_name} {'(' + ', '.join(columns) + ')' if columns else ''} VALUES {values}"""
         await LemkPgUtils.execute_query(self.dsn, query)
         return True
 
@@ -773,7 +773,7 @@ class AsyncLemkPgApi:
         return result
 
     async def inner_join(self, table_name: str, join_table_name: str,
-                   on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+                         on_condition: tuple, where_conditions_list=None, fields=None, all=True):
         """
         >>> await db_conn.inner_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
 
@@ -799,16 +799,16 @@ class AsyncLemkPgApi:
         if where_conditions_list:
             conditions = LemkPgUtils.get_conditions(where_conditions_list)
             query = (f"""SELECT {query_fields} FROM {table_name} INNER JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
-                         f""" WHERE {" ".join(conditions)}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                     f""" WHERE {" ".join(conditions)}""")
         else:
             query = (f"""SELECT {query_fields} FROM {table_name} INNER JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
         result = await LemkPgUtils.get_query_result(self.dsn, query)
         return result
 
     async def left_join(self, table_name: str, join_table_name: str,
-                  on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+                        on_condition: tuple, where_conditions_list=None, fields=None, all=True):
         """
         >>> await db_conn.left_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
 
@@ -834,16 +834,16 @@ class AsyncLemkPgApi:
         if where_conditions_list:
             conditions = LemkPgUtils.get_conditions(where_conditions_list)
             query = (f"""SELECT {query_fields} FROM {table_name} LEFT JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
-                         f""" WHERE {" ".join(conditions)}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                     f""" WHERE {" ".join(conditions)}""")
         else:
             query = (f"""SELECT {query_fields} FROM {table_name} LEFT JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
         result = await LemkPgUtils.get_query_result(self.dsn, query)
         return result
 
     async def right_join(self, table_name: str, join_table_name: str,
-                   on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+                         on_condition: tuple, where_conditions_list=None, fields=None, all=True):
         """
         >>> await db_conn.right_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
 
@@ -869,16 +869,16 @@ class AsyncLemkPgApi:
         if where_conditions_list:
             conditions = LemkPgUtils.get_conditions(where_conditions_list)
             query = (f"""SELECT {query_fields} FROM {table_name} RIGHT JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
-                         f""" WHERE {" ".join(conditions)}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                     f""" WHERE {" ".join(conditions)}""")
         else:
             query = (f"""SELECT {query_fields} FROM {table_name} RIGHT JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
         result = await LemkPgUtils.get_query_result(self.dsn, query)
         return result
 
     async def full_join(self, table_name: str, join_table_name: str,
-                  on_condition: tuple, where_conditions_list=None, fields=None, all=True):
+                        on_condition: tuple, where_conditions_list=None, fields=None, all=True):
         """
         >>> await db_conn.full_join("demo", "datatable", ("demo.trans", "=", "datatable.trans"))
 
@@ -904,11 +904,11 @@ class AsyncLemkPgApi:
         if where_conditions_list:
             conditions = LemkPgUtils.get_conditions(where_conditions_list)
             query = (f"""SELECT {query_fields} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
-                         f""" WHERE {" ".join(conditions)}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}"""
+                     f""" WHERE {" ".join(conditions)}""")
         else:
             query = (f"""SELECT {query_fields} FROM {table_name} FULL OUTER JOIN {join_table_name}"""
-                         f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
+                     f""" ON {on_condition[0]} {on_condition[1]} {on_condition[2]}""")
         result = await LemkPgUtils.get_query_result(self.dsn, query)
         return result
 
