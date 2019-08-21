@@ -54,9 +54,9 @@ class LemkPgApi:
         async def func():
             new_fields = [f"{field[0]} {field[1]}" for field in fields.items()]
             if not primary_key:
-                query = f"""CREATE TABLE {table_name} ({", ".join(new_fields)})"""
+                query = f"""CREATE TABLE IF NOT EXISTS {table_name} ({", ".join(new_fields)})"""
             else:
-                query = f"""CREATE TABLE {table_name} (id SERIAL PRIMARY KEY, {", ".join(new_fields)})"""
+                query = f"""CREATE TABLE IF NOT EXISTS {table_name} (id SERIAL PRIMARY KEY, {", ".join(new_fields)})"""
             await LemkPgUtils.execute_query(self.dsn, query)
             return True
 
@@ -73,7 +73,7 @@ class LemkPgApi:
         """
 
         async def func():
-            query = f"""INSERT INTO {table_name} {tuple(columns) if columns else ''} VALUES {values}"""
+            query = f"""INSERT INTO {table_name} {'(' + ', '.join(columns) + ')' if columns else ''} VALUES {values}"""
             await LemkPgUtils.execute_query(self.dsn, query)
             return True
 
@@ -593,9 +593,9 @@ class AsyncLemkPgApi:
 
     def __init__(self, db_name: str, db_user: str, db_password: str, db_host: str, *args, **kwargs):
         """
-        You can create db_connect of LemkPgApi when you define all required attrs.
+        You can create db_connect of AsyncLemkPgApi when you define all required attrs.
         Example of db_connect creation:
-        >>> db_conn = LemkPgApi(db_name="demo_db", db_password="pass", db_user="postgres", db_host="127.0.0.1")
+        >>> db_conn = AsyncLemkPgApi(db_name="demo_db", db_password="pass", db_user="postgres", db_host="127.0.0.1")
 
         :param db_name: string with name of the database
         :param db_user: string with user name
@@ -621,9 +621,9 @@ class AsyncLemkPgApi:
         """
         new_fields = [f"{field[0]} {field[1]}" for field in fields.items()]
         if not primary_key:
-            query = f"""CREATE TABLE {table_name} ({", ".join(new_fields)})"""
+            query = f"""CREATE TABLE IF NOT EXISTS {table_name} ({", ".join(new_fields)})"""
         else:
-            query = f"""CREATE TABLE {table_name} (id SERIAL PRIMARY KEY, {", ".join(new_fields)})"""
+            query = f"""CREATE TABLE IF NOT EXISTS {table_name} (id SERIAL PRIMARY KEY, {", ".join(new_fields)})"""
         await LemkPgUtils.execute_query(self.dsn, query)
         return True
 
@@ -657,7 +657,8 @@ class AsyncLemkPgApi:
     async def get(self, table_name: str, fields: list,
                   conditions_list=None, distinct=False, order_by=None, sort_type=None):
         """
-        >>> await db_conn.get("demo", ["date", "symbol"], conditions_list=[("date", "=", "2006-01-05", None)], distinct=True)
+        >>> await db_conn.get("demo", ["date", "symbol"], conditions_list=[("date", "=", "2006-01-05", None)],
+         distinct=True)
 
         :param table_name: string with table name
         :param fields: list with fields for selection
